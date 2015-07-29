@@ -39,6 +39,8 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        FetchMovieDataTask movieDataTask = new FetchMovieDataTask();
+        movieDataTask.execute();
         return inflater.inflate(R.layout.fragment_main, container, false);
     }
 
@@ -158,44 +160,29 @@ public class MainActivityFragment extends Fragment {
         @Override
         protected String[] doInBackground(Void... params) {
 
-//            No param? nothing to looking?
-//            if (params.length == 0) {
-//                return null;
-//            }
-
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
             // Will contain the raw JSON response as a string.
-            String forecastJsonStr = null;
+            String moviesJsonStr = null;
 
-            String format = "json";
-            String units = "metric";
-            int numDays = 7;
+            String sort = "popularity.desc";
 
             try {
-                // Construct the URL for the OpenWeatherMap query
-                // Possible parameters are avaiable at OWM's forecast API page, at
-                // http://openweathermap.org/API#forecast
-
-                final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
-                final String QUERY_PARAM = "q";
-                final String FORMAT_PARAM = "mode";
-                final String UNITS_PARAM = "units";
-                final String DAYS_PARAM = "cnt";
+                final String FORECAST_BASE_URL = "http://api.themoviedb.org/3/discover/movie";
+                final String SORT_BY_PARAM = "sort_by";
+                final String API_PARAM = "api_key";
 
                 Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-//                        .appendQueryParameter(QUERY_PARAM, params[0])
-                        .appendQueryParameter(FORMAT_PARAM, format)
-                        .appendQueryParameter(UNITS_PARAM, units)
-                        .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
+                        .appendQueryParameter(SORT_BY_PARAM, sort)
+                        .appendQueryParameter(API_PARAM, getString(R.string.the_movie_db_api_key))
                         .build();
 
                 URL url = new URL(builtUri.toString());
 
-                // Create the request to OpenWeatherMap, and open the connection
+                // Create the request to TheMovieDB, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
@@ -221,7 +208,7 @@ public class MainActivityFragment extends Fragment {
                     // Stream was empty.  No point in parsing.
                     return null;
                 }
-                forecastJsonStr = buffer.toString();
+                moviesJsonStr = buffer.toString();
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attemping
@@ -241,7 +228,8 @@ public class MainActivityFragment extends Fragment {
             }
 
 //            try {
-                return null;
+            Log.v(LOG_TAG, moviesJsonStr);
+            return null;
 //                return getWeatherDataFromJson(forecastJsonStr, numDays);
 //            }
 //            catch (JSONException e) {
