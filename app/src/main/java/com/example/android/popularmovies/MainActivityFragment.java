@@ -85,77 +85,35 @@ public class MainActivityFragment extends Fragment {
          * Fortunately parsing is easy:  constructor takes the JSON string and converts it
          * into an Object hierarchy for us.
          */
-//        private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
-//                throws JSONException {
-//
-//            // These are the names of the JSON objects that need to be extracted.
-//            final String OWM_LIST = "list";
-//            final String OWM_WEATHER = "weather";
-//            final String OWM_TEMPERATURE = "temp";
-//            final String OWM_MAX = "max";
-//            final String OWM_MIN = "min";
-//            final String OWM_DESCRIPTION = "main";
-//
-//            JSONObject forecastJson = new JSONObject(forecastJsonStr);
-//            JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
-//
-//            // OWM returns daily forecasts based upon the local time of the city that is being
-//            // asked for, which means that we need to know the GMT offset to translate this data
-//            // properly.
-//
-//            // Since this data is also sent in-order and the first day is always the
-//            // current day, we're going to take advantage of that to get a nice
-//            // normalized UTC date for all of our weather.
-//
-//            Time dayTime = new Time();
-//            dayTime.setToNow();
-//
-//            // we start at the day returned by local time. Otherwise this is a mess.
-//            int julianStartDay = Time.getJulianDay(System.currentTimeMillis(), dayTime.gmtoff);
-//
-//            // now we work exclusively in UTC
-//            dayTime = new Time();
-//
-//            String[] resultStrs = new String[numDays];
-//            for(int i = 0; i < weatherArray.length(); i++) {
-//                // For now, using the format "Day, description, hi/low"
-//                String day;
-//                String description;
-//                String highAndLow;
-//
-//                // Get the JSON object representing the day
-//                JSONObject dayForecast = weatherArray.getJSONObject(i);
-//
-//                // The date/time is returned as a long.  We need to convert that
-//                // into something human-readable, since most people won't read "1400356800" as
-//                // "this saturday".
-//                long dateTime;
-//                // Cheating to convert this to UTC time, which is what we want anyhow
-//                dateTime = dayTime.setJulianDay(julianStartDay+i);
-//                day = getReadableDateString(dateTime);
-//
-//                // description is in a child array called "weather", which is 1 element long.
-//                JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
-//                description = weatherObject.getString(OWM_DESCRIPTION);
-//
-//                // Temperatures are in a child object called "temp".  Try not to name variables
-//                // "temp" when working with temperature.  It confuses everybody.
-//                JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
-//                double high = temperatureObject.getDouble(OWM_MAX);
-//                double low = temperatureObject.getDouble(OWM_MIN);
-//
-//                highAndLow = formatHighLows(high, low);
-//                resultStrs[i] = day + " - " + description + " - " + highAndLow;
-//            }
-//
-//            return resultStrs;
-//
-//        }
+        private String[] getMovieDataFromJson(String movieJsonStr)
+                throws JSONException {
 
-        public double convertToImperial(double metricVal) {
-            return metricVal * 1.8 + 32;
+            // These are the names of the JSON objects that need to be extracted.
+            final String MOVIES_LIST = "results";
+            final String TITLE = "title";
+            final String DESCRIPTION = "overview";
+
+            JSONObject movieJson = new JSONObject(movieJsonStr);
+            JSONArray moviesArray = movieJson.getJSONArray(MOVIES_LIST);
+            int moviesCount = moviesArray.length();
+
+            String[] resultStrs = new String[moviesCount];
+            for(int i = 0; i < moviesCount; i++) {
+                String title;
+                String description;
+
+                // Get the JSON object representing the movie
+                JSONObject movie = moviesArray.getJSONObject(i);
+
+                // description is in a child array called "weather", which is 1 element long.
+                title = movie.getString(TITLE);
+                description = movie.getString(DESCRIPTION);
+                resultStrs[i] = title + " - " + description;
+            }
+
+            return resultStrs;
+
         }
-
 
         @Override
         protected String[] doInBackground(Void... params) {
@@ -211,7 +169,7 @@ public class MainActivityFragment extends Fragment {
                 moviesJsonStr = buffer.toString();
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attemping
+                // If the code didn't successfully get the movie data, there's no point in attemping
                 // to parse it.
                 return null;
             } finally{
@@ -227,25 +185,27 @@ public class MainActivityFragment extends Fragment {
                 }
             }
 
-//            try {
-            Log.v(LOG_TAG, moviesJsonStr);
-            return null;
-//                return getWeatherDataFromJson(forecastJsonStr, numDays);
-//            }
-//            catch (JSONException e) {
-//                Log.e(LOG_TAG, e.getMessage(), e);
-//                e.printStackTrace();
-//            }
+            try {
+                Log.v(LOG_TAG, moviesJsonStr);
+                return getMovieDataFromJson(moviesJsonStr);
+            }
+            catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                e.printStackTrace();
+            }
 
 //            This return is only here in case the return above gets caught in an exception
-//            return null;
+            return null;
         }
 
         @Override
-        protected void onPostExecute(String[] parsedForecasts) {
-            List<String> weekForecast = new ArrayList<String>(Arrays.asList(parsedForecasts));
+        protected void onPostExecute(String[] parsedMovies) {
+            List<String> weekForecast = new ArrayList<String>(Arrays.asList(parsedMovies));
 
             if (weekForecast != null) {
+                for(String movie : parsedMovies) {
+                    Log.v(LOG_TAG, movie);
+                }
 //                mForecastAdapter.clear();
 //                for (String dayForecast : weekForecast) {
 //                    mForecastAdapter.add(dayForecast);
