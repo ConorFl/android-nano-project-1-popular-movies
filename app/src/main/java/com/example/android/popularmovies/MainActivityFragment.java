@@ -44,39 +44,10 @@ public class MainActivityFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_main, container, false);
     }
 
-    public class FetchMovieDataTask extends AsyncTask<Void, Void, String[]> {
+    public class FetchMovieDataTask extends AsyncTask<Void, Void, Movie[]> {
 
         private final String LOG_TAG = FetchMovieDataTask.class.getSimpleName();
 
-
-        /* The date/time conversion code is going to be moved outside the asynctask later,
- * so for convenience we're breaking it out into its own method now.
- */
-        private String getReadableDateString(long time){
-            // Because the API returns a unix timestamp (measured in seconds),
-            // it must be converted to milliseconds in order to be converted to valid date.
-            SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEE MMM dd");
-            return shortenedDateFormat.format(time);
-        }
-
-        /**
-         * Prepare the weather high/lows for presentation.
-         */
-//        private String formatHighLows(double high, double low) {
-//            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-//            String preferredUnits = prefs.getString(getString(R.string.pref_units_key),
-//                    getString(R.string.pref_units_metric));
-//            if (preferredUnits.equals(getString(R.string.pref_units_imperial))) {
-//                high = convertToImperial(high);
-//                low = convertToImperial(low);
-//            }
-//            // For presentation, assume the user doesn't care about tenths of a degree.
-//            long roundedHigh = Math.round(high);
-//            long roundedLow = Math.round(low);
-//
-//            String highLowStr = roundedHigh + "/" + roundedLow;
-//            return highLowStr;
-//        }
 
         /**
          * Take the String representing the complete forecast in JSON Format and
@@ -85,7 +56,7 @@ public class MainActivityFragment extends Fragment {
          * Fortunately parsing is easy:  constructor takes the JSON string and converts it
          * into an Object hierarchy for us.
          */
-        private String[] getMovieDataFromJson(String movieJsonStr)
+        private Movie[] getMoviesFromJson(String movieJsonStr)
                 throws JSONException {
 
             // These are the names of the JSON objects that need to be extracted.
@@ -97,7 +68,7 @@ public class MainActivityFragment extends Fragment {
             JSONArray moviesArray = movieJson.getJSONArray(MOVIES_LIST);
             int moviesCount = moviesArray.length();
 
-            String[] resultStrs = new String[moviesCount];
+            Movie[] results = new Movie[moviesCount];
             for(int i = 0; i < moviesCount; i++) {
                 String title;
                 String description;
@@ -108,15 +79,15 @@ public class MainActivityFragment extends Fragment {
                 // description is in a child array called "weather", which is 1 element long.
                 title = movie.getString(TITLE);
                 description = movie.getString(DESCRIPTION);
-                resultStrs[i] = title + " - " + description;
+                results[i] = new Movie(title, description);
             }
 
-            return resultStrs;
+            return results;
 
         }
 
         @Override
-        protected String[] doInBackground(Void... params) {
+        protected Movie[] doInBackground(Void... params) {
 
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
@@ -169,8 +140,8 @@ public class MainActivityFragment extends Fragment {
                 moviesJsonStr = buffer.toString();
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the movie data, there's no point in attemping
-                // to parse it.
+                // If the code didn't successfully get the movie data, there's no point in
+                // attempting to parse it.
                 return null;
             } finally{
                 if (urlConnection != null) {
@@ -186,8 +157,7 @@ public class MainActivityFragment extends Fragment {
             }
 
             try {
-                Log.v(LOG_TAG, moviesJsonStr);
-                return getMovieDataFromJson(moviesJsonStr);
+                return getMoviesFromJson(moviesJsonStr);
             }
             catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
@@ -199,12 +169,12 @@ public class MainActivityFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(String[] parsedMovies) {
-            List<String> weekForecast = new ArrayList<String>(Arrays.asList(parsedMovies));
+        protected void onPostExecute(Movie[] parsedMovies) {
+            List<Movie> weekForecast = new ArrayList<Movie>(Arrays.asList(parsedMovies));
 
             if (weekForecast != null) {
-                for(String movie : parsedMovies) {
-                    Log.v(LOG_TAG, movie);
+                for(Movie movie : parsedMovies) {
+                    Log.v(LOG_TAG, movie.toString());
                 }
 //                mForecastAdapter.clear();
 //                for (String dayForecast : weekForecast) {
