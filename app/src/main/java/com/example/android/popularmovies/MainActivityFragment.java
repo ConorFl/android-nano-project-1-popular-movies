@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,9 +43,15 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         FetchMovieDataTask movieDataTask = new FetchMovieDataTask();
         movieDataTask.execute();
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        mMovieAdapter = new MovieAdapter(getActivity(), new ArrayList<Movie>());
+
+        GridView gridView = (GridView) rootView.findViewById(R.id.movies_grid);
+        gridView.setAdapter(mMovieAdapter);
+
+        return rootView;
     }
 
     public class FetchMovieDataTask extends AsyncTask<Void, Void, Movie[]> {
@@ -176,8 +183,10 @@ public class MainActivityFragment extends Fragment {
             List<Movie> weekForecast = new ArrayList<Movie>(Arrays.asList(parsedMovies));
 
             if (weekForecast != null) {
+                mMovieAdapter.clear();
                 for(Movie movie : parsedMovies) {
                     Log.v(LOG_TAG, movie.toString());
+                    mMovieAdapter.add(movie);
                 }
 //                mForecastAdapter.clear();
 //                for (String dayForecast : weekForecast) {
