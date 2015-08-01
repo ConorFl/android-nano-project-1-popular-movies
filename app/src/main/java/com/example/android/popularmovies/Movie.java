@@ -6,12 +6,12 @@ package com.example.android.popularmovies;
 public class Movie {
     String title;
     String overview;
-    int image; // drawable ref id
+    String imageUrl;
 
-    public Movie(String title, String overview) {
+    public Movie(String title, String overview, String imageUrl) {
         this.title = title;
         this.overview = overview;
 //        leave out image for now, gotta look into drawables, use lib mentioned in instructions
-//        this.image = image;
+        this.imageUrl = imageUrl;
     }
 }

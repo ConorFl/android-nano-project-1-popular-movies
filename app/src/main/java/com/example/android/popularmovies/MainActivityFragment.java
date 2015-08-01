@@ -73,6 +73,7 @@ public class MainActivityFragment extends Fragment {
             final String MOVIES_LIST = "results";
             final String TITLE = "title";
             final String DESCRIPTION = "overview";
+            final String IMAGE_URL = "poster_path";
 
             JSONObject movieJson = new JSONObject(movieJsonStr);
             JSONArray moviesArray = movieJson.getJSONArray(MOVIES_LIST);
@@ -82,14 +83,16 @@ public class MainActivityFragment extends Fragment {
             for(int i = 0; i < moviesCount; i++) {
                 String title;
                 String description;
-
+                String imageUrl;
                 // Get the JSON object representing the movie
                 JSONObject movie = moviesArray.getJSONObject(i);
 
                 // description is in a child array called "weather", which is 1 element long.
                 title = movie.getString(TITLE);
                 description = movie.getString(DESCRIPTION);
-                results[i] = new Movie(title, description);
+                imageUrl = movie.getString(IMAGE_URL);
+
+                results[i] = new Movie(title, description, imageUrl);
             }
 
             return results;
