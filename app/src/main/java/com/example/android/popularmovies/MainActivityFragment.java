@@ -71,6 +71,8 @@ public class MainActivityFragment extends Fragment {
 
             // These are the names of the JSON objects that need to be extracted.
             final String MOVIES_LIST = "results";
+
+            final String ID = "id";
             final String TITLE = "title";
             final String DESCRIPTION = "overview";
             final String IMAGE_URL = "poster_path";
@@ -81,18 +83,19 @@ public class MainActivityFragment extends Fragment {
 
             Movie[] results = new Movie[moviesCount];
             for(int i = 0; i < moviesCount; i++) {
+                int id;
                 String title;
                 String description;
                 String imageUrl;
                 // Get the JSON object representing the movie
                 JSONObject movie = moviesArray.getJSONObject(i);
 
-                // description is in a child array called "weather", which is 1 element long.
+                id = movie.getInt(ID);
                 title = movie.getString(TITLE);
                 description = movie.getString(DESCRIPTION);
                 imageUrl = movie.getString(IMAGE_URL);
 
-                results[i] = new Movie(title, description, imageUrl);
+                results[i] = new Movie(id, title, description, imageUrl);
             }
 
             return results;
