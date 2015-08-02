@@ -102,6 +102,12 @@ public class MainActivityFragment extends Fragment {
 
         }
 
+        private String getSortPreference() {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            return prefs.getString(getString(R.string.pref_sort_by_key),
+                    getString(R.string.pref_sort_by_default_value));
+        }
+
         @Override
         protected Movie[] doInBackground(Void... params) {
 
@@ -113,15 +119,13 @@ public class MainActivityFragment extends Fragment {
             // Will contain the raw JSON response as a string.
             String moviesJsonStr = null;
 
-            String sort = "popularity.desc";
-
             try {
                 final String FORECAST_BASE_URL = "http://api.themoviedb.org/3/discover/movie";
                 final String SORT_BY_PARAM = "sort_by";
                 final String API_PARAM = "api_key";
 
                 Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                        .appendQueryParameter(SORT_BY_PARAM, sort)
+                        .appendQueryParameter(SORT_BY_PARAM, getSortPreference())
                         .appendQueryParameter(API_PARAM, getString(R.string.the_movie_db_api_key))
                         .build();
 
