@@ -44,14 +44,24 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        FetchMovieDataTask movieDataTask = new FetchMovieDataTask();
-        movieDataTask.execute();
+
         mMovieAdapter = new MovieAdapter(getActivity(), new ArrayList<Movie>());
 
         GridView gridView = (GridView) rootView.findViewById(R.id.movies_grid);
         gridView.setAdapter(mMovieAdapter);
 
         return rootView;
+    }
+
+    public void updateMovies() {
+        FetchMovieDataTask movieDataTask = new FetchMovieDataTask();
+        movieDataTask.execute();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateMovies();
     }
 
     public class FetchMovieDataTask extends AsyncTask<Void, Void, Movie[]> {
@@ -110,7 +120,7 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected Movie[] doInBackground(Void... params) {
-
+            Log.v("FIRING", "fire!");
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
