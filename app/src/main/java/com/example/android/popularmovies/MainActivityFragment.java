@@ -60,6 +60,8 @@ public class MainActivityFragment extends Fragment {
 
                 Intent detailsIntent = new Intent(getActivity(), DetailsActivity.class);
                 detailsIntent.putExtra(Intent.EXTRA_TEXT, movieId);
+//                todo: pass title to update detailsActivity title
+//                detailsIntent.putExtra(Intent.EXTRA_TEXT, movieId);
                 startActivity(detailsIntent);
             }
         });
@@ -101,8 +103,8 @@ public class MainActivityFragment extends Fragment {
             final String DESCRIPTION = "overview";
             final String IMAGE_URL = "poster_path";
 
-            JSONObject movieJson = new JSONObject(movieJsonStr);
-            JSONArray moviesArray = movieJson.getJSONArray(MOVIES_LIST);
+            JSONObject moviesJson = new JSONObject(movieJsonStr);
+            JSONArray moviesArray = moviesJson.getJSONArray(MOVIES_LIST);
             int moviesCount = moviesArray.length();
 
             Movie[] results = new Movie[moviesCount];
@@ -134,7 +136,6 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected Movie[] doInBackground(Void... params) {
-            Log.v("FIRING", "fire!");
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
