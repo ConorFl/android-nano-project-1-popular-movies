@@ -13,7 +13,6 @@ public class Movie {
         this.id = id;
         this.title = title;
         this.overview = overview;
-//        should I be doing images instead?
         this.imageUrl = imageUrl;
     }
 }

@@ -43,7 +43,6 @@ public class DetailsActivityFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_details, container, false);
 
         Intent intent = getActivity().getIntent();
-//        Default to 'Fight Club'.  Better options?
         int movieId = intent.getIntExtra(Intent.EXTRA_TEXT, 550);
         String movieTitle = intent.getStringExtra("movieTitle");
 
@@ -64,10 +63,6 @@ public class DetailsActivityFragment extends Fragment {
     public class FetchMovieDetailsDataTask extends AsyncTask<Integer, Void, String> {
 
         private final String LOG_TAG = FetchMovieDetailsDataTask.class.getSimpleName();
-
-        private Void setMovieDetails() {
-            return null;
-        }
 
         @Override
         protected String doInBackground(Integer... params) {
@@ -136,7 +131,6 @@ public class DetailsActivityFragment extends Fragment {
             }
 
             try {
-                Log.v("CFMOVIEDETAILS", moviesJsonStr);
                 return moviesJsonStr;
             }
             catch (Exception e) {
@@ -150,14 +144,12 @@ public class DetailsActivityFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String movieJsonStr) {
-            String originalTitle;
             String posterUrl;
             String synopsis;
             Double rating;
             String releaseDate;
             try {
                 JSONObject movieJson = new JSONObject(movieJsonStr);
-                originalTitle = movieJson.getString("original_title");
                 posterUrl = movieJson.getString("poster_path");
                 synopsis = movieJson.getString("overview");
                 rating = movieJson.getDouble("vote_average");
@@ -165,7 +157,6 @@ public class DetailsActivityFragment extends Fragment {
 
                 ImageView posterView = (ImageView) rootView.findViewById(R.id.movie_poster);
                 Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w185" + posterUrl).into(posterView);
-//                Picasso.with(getContext()).load(BASE_POSTER_URL + movie.imageUrl).into(movieImage);
 
                 TextView synopsisView = (TextView) rootView.findViewById(R.id.movie_synopsis);
                 synopsisView.setText(synopsis);
@@ -176,11 +167,6 @@ public class DetailsActivityFragment extends Fragment {
                 TextView releaseDateView = (TextView) rootView.findViewById(R.id.movie_release_date);
                 releaseDateView.setText(releaseDate);
 
-                //            original title
-                //            movie poster image thumbnail
-                //            A plot synopsis (called overview in the api)
-                //            user rating (called vote_average in the api)
-                //            release date
             } catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();

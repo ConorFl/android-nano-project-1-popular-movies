@@ -7,13 +7,11 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
 import org.json.JSONArray;
@@ -26,15 +24,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class MainActivityFragment extends Fragment {
 
     private MovieAdapter mMovieAdapter;
@@ -224,10 +218,6 @@ public class MainActivityFragment extends Fragment {
                     Log.v(LOG_TAG, movie.toString());
                     mMovieAdapter.add(movie);
                 }
-//                mForecastAdapter.clear();
-//                for (String dayForecast : weekForecast) {
-//                    mForecastAdapter.add(dayForecast);
-//                }
             }
         }
     }
