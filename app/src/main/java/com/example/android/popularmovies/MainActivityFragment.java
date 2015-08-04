@@ -56,12 +56,13 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Movie selectedMovie = mMovieAdapter.getItem(position);
+
                 int movieId = selectedMovie.id;
+                String movieTitle = selectedMovie.title;
 
                 Intent detailsIntent = new Intent(getActivity(), DetailsActivity.class);
                 detailsIntent.putExtra(Intent.EXTRA_TEXT, movieId);
-//                todo: pass title to update detailsActivity title
-//                detailsIntent.putExtra(Intent.EXTRA_TEXT, movieId);
+                detailsIntent.putExtra("movieTitle", movieTitle);
                 startActivity(detailsIntent);
             }
         });

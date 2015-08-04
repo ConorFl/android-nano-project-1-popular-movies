@@ -44,12 +44,21 @@ public class DetailsActivityFragment extends Fragment {
 
         Intent intent = getActivity().getIntent();
 //        Default to 'Fight Club'.  Better options?
-        int id = intent.getIntExtra(Intent.EXTRA_TEXT, 550);
+        int movieId = intent.getIntExtra(Intent.EXTRA_TEXT, 550);
+        String movieTitle = intent.getStringExtra("movieTitle");
+
+        if (movieTitle != null) {
+            setActivityTitle(movieTitle);
+        }
 
         FetchMovieDetailsDataTask fetchDetailsTask = new FetchMovieDetailsDataTask();
-        fetchDetailsTask.execute(id);
+        fetchDetailsTask.execute(movieId);
 
         return rootView;
+    }
+
+    public void setActivityTitle(String movieTitle) {
+        getActivity().setTitle(movieTitle);
     }
 
     public class FetchMovieDetailsDataTask extends AsyncTask<Integer, Void, String> {
