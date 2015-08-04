@@ -163,13 +163,9 @@ public class DetailsActivityFragment extends Fragment {
                 rating = movieJson.getDouble("vote_average");
                 releaseDate = movieJson.getString("release_date");
 
-                ImageView posterView = (ImageView) rootView.findViewById(R.id.details_poster);
+                ImageView posterView = (ImageView) rootView.findViewById(R.id.movie_poster);
                 Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w185" + posterUrl).into(posterView);
 //                Picasso.with(getContext()).load(BASE_POSTER_URL + movie.imageUrl).into(movieImage);
-
-
-                TextView titleView = (TextView) rootView.findViewById(R.id.movie_title);
-                titleView.setText(originalTitle);
 
                 TextView synopsisView = (TextView) rootView.findViewById(R.id.movie_synopsis);
                 synopsisView.setText(synopsis);

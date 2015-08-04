@@ -18,36 +18,25 @@
         <ImageView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/details_poster"
-            android:src="@drawable/fightclub"
+            android:id="@+id/movie_poster"
             android:adjustViewBounds="true" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/movie_title"
-            android:layout_below="@id/details_poster"
-            android:text="Fight Club"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/movie_synopsis"
-            android:layout_below="@id/movie_title"
-            android:text="We fight in a Fight club and stuff."/>
+            android:layout_below="@id/movie_poster" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/movie_rating"
-            android:layout_below="@id/movie_synopsis"
-            android:text="8.5"/>
+            android:layout_below="@id/movie_synopsis" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/movie_release_date"
-            android:layout_below="@id/movie_rating"
-            android:text="2005-01-01" />
+            android:layout_below="@id/movie_rating" />
     </LinearLayout>
 </ScrollView>
