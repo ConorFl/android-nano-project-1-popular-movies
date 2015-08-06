@@ -210,12 +210,9 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Movie[] parsedMovies) {
-            List<Movie> weekForecast = new ArrayList<Movie>(Arrays.asList(parsedMovies));
-
-            if (weekForecast != null) {
+            if (parsedMovies != null) {
                 mMovieAdapter.clear();
                 for(Movie movie : parsedMovies) {
-                    Log.v(LOG_TAG, movie.toString());
                     mMovieAdapter.add(movie);
                 }
             }
