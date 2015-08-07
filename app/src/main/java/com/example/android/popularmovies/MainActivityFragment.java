@@ -98,17 +98,6 @@ public class MainActivityFragment extends Fragment {
         return rootView;
     }
 
-//    public void updateMovies() {
-//        FetchMovieDataTask movieDataTask = new FetchMovieDataTask();
-//        movieDataTask.execute();
-//    }
-
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        updateMovies();
-//    }
-
     public class FetchMovieDataTask extends AsyncTask<Void, Void, Movie[]> {
 
         private final String LOG_TAG = FetchMovieDataTask.class.getSimpleName();
@@ -131,6 +120,8 @@ public class MainActivityFragment extends Fragment {
             final String TITLE = "title";
             final String DESCRIPTION = "overview";
             final String IMAGE_URL = "poster_path";
+            final String RATING = "vote_average";
+            final String RELEASE_DATE = "release_date";
 
             JSONObject moviesJson = new JSONObject(movieJsonStr);
             JSONArray moviesArray = moviesJson.getJSONArray(MOVIES_LIST);
@@ -142,6 +133,8 @@ public class MainActivityFragment extends Fragment {
                 String title;
                 String description;
                 String imageUrl;
+                String releaseDate;
+                Double rating;
                 // Get the JSON object representing the movie
                 JSONObject movie = moviesArray.getJSONObject(i);
 
@@ -149,8 +142,10 @@ public class MainActivityFragment extends Fragment {
                 title = movie.getString(TITLE);
                 description = movie.getString(DESCRIPTION);
                 imageUrl = movie.getString(IMAGE_URL);
+                releaseDate = movie.getString(RELEASE_DATE);
+                rating = movie.getDouble(RATING);
 
-                results[i] = new Movie(id, title, description, imageUrl);
+                results[i] = new Movie(id, title, description, imageUrl, releaseDate, rating);
             }
 
             return results;

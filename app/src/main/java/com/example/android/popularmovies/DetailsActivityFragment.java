@@ -173,4 +173,24 @@ public class DetailsActivityFragment extends Fragment {
             }
         }
     }
+
+    private void populateView(Movie movie) {
+        String posterUrl = movie.imageUrl;
+        String synopsis = movie.overview;
+        String releaseDate = movie.releaseDate;
+        Double rating = movie.rating;
+
+
+        ImageView posterView = (ImageView) rootView.findViewById(R.id.movie_poster);
+        Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w185" + posterUrl).into(posterView);
+
+        TextView synopsisView = (TextView) rootView.findViewById(R.id.movie_synopsis);
+        synopsisView.setText(synopsis);
+
+        TextView ratingView = (TextView) rootView.findViewById(R.id.movie_rating);
+        ratingView.setText(Double.toString(rating));
+
+        TextView releaseDateView = (TextView) rootView.findViewById(R.id.movie_release_date);
+        releaseDateView.setText(releaseDate);
+    }
 }
