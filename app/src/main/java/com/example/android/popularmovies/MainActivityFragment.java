@@ -25,15 +25,49 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 
 public class MainActivityFragment extends Fragment {
 
     private MovieAdapter mMovieAdapter;
+    private ArrayList<Movie> movieList;
+    private String sortPreferences;
 
     public MainActivityFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        sortPreferences = getSortPreference();
+        if (savedInstanceState == null || !savedInstanceState.containsKey("movies")) {
+            Log.v("conorf", "if true");
+            movieList = new ArrayList<Movie>();
+            getMovies();
+        } else {
+            Log.v("conorf", "if else");
+            movieList = savedInstanceState.getParcelableArrayList("movies");
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("movies", movieList);
+        outState.putString("sortPreference", getSortPreference());
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (sortPreferences != getSortPreference()) {
+            getMovies();
+        }
+    }
+
+    private void getMovies() {
+        FetchMovieDataTask movieDataTask = new FetchMovieDataTask();
+        movieDataTask.execute();
     }
 
     @Override
@@ -41,7 +75,7 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        mMovieAdapter = new MovieAdapter(getActivity(), new ArrayList<Movie>());
+        mMovieAdapter = new MovieAdapter(getActivity(), movieList);
 
         GridView gridView = (GridView) rootView.findViewById(R.id.movies_grid);
         gridView.setAdapter(mMovieAdapter);
@@ -64,16 +98,16 @@ public class MainActivityFragment extends Fragment {
         return rootView;
     }
 
-    public void updateMovies() {
-        FetchMovieDataTask movieDataTask = new FetchMovieDataTask();
-        movieDataTask.execute();
-    }
+//    public void updateMovies() {
+//        FetchMovieDataTask movieDataTask = new FetchMovieDataTask();
+//        movieDataTask.execute();
+//    }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        updateMovies();
-    }
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        updateMovies();
+//    }
 
     public class FetchMovieDataTask extends AsyncTask<Void, Void, Movie[]> {
 
@@ -121,12 +155,6 @@ public class MainActivityFragment extends Fragment {
 
             return results;
 
-        }
-
-        private String getSortPreference() {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            return prefs.getString(getString(R.string.pref_sort_by_key),
-                    getString(R.string.pref_sort_by_default_value));
         }
 
         @Override
@@ -210,11 +238,18 @@ public class MainActivityFragment extends Fragment {
         @Override
         protected void onPostExecute(Movie[] parsedMovies) {
             if (parsedMovies != null) {
-                mMovieAdapter.clear();
+                movieList.clear();
                 for(Movie movie : parsedMovies) {
-                    mMovieAdapter.add(movie);
+                    movieList.add(movie);
                 }
+                mMovieAdapter.notifyDataSetChanged();
             }
         }
+    }
+
+    private String getSortPreference() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        return prefs.getString(getString(R.string.pref_sort_by_key),
+                getString(R.string.pref_sort_by_default_value));
     }
 }
