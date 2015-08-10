@@ -29,6 +29,7 @@ import java.util.ArrayList;
 
 public class MainActivityFragment extends Fragment {
 
+    private final String MOVIE = "movie";
     private MovieAdapter mMovieAdapter;
     private ArrayList<Movie> movieList;
     private String sortPreferences;
@@ -41,18 +42,16 @@ public class MainActivityFragment extends Fragment {
         super.onCreate(savedInstanceState);
         sortPreferences = getSortPreference();
         if (savedInstanceState == null || !savedInstanceState.containsKey("movies")) {
-            Log.v("conorf", "if true");
             movieList = new ArrayList<Movie>();
             getMovies();
         } else {
-            Log.v("conorf", "if else");
             movieList = savedInstanceState.getParcelableArrayList("movies");
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList("movies", movieList);
+        outState.putParcelableArrayList(MOVIE, movieList);
         outState.putString("sortPreference", getSortPreference());
         super.onSaveInstanceState(outState);
     }
@@ -85,12 +84,9 @@ public class MainActivityFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Movie selectedMovie = mMovieAdapter.getItem(position);
 
-                int movieId = selectedMovie.id;
-                String movieTitle = selectedMovie.title;
-
                 Intent detailsIntent = new Intent(getActivity(), DetailsActivity.class);
-                detailsIntent.putExtra(Intent.EXTRA_TEXT, movieId);
-                detailsIntent.putExtra("movieTitle", movieTitle);
+                detailsIntent.putExtra(MOVIE, selectedMovie);
+
                 startActivity(detailsIntent);
             }
         });
