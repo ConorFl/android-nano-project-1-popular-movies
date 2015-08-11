@@ -30,6 +30,8 @@ import java.util.ArrayList;
 public class MainActivityFragment extends Fragment {
 
     private final String MOVIE = "movie";
+    private final String MOVIES = "movies";
+
     private MovieAdapter mMovieAdapter;
     private ArrayList<Movie> movieList;
     private String sortPreferences;
@@ -41,17 +43,17 @@ public class MainActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sortPreferences = getSortPreference();
-        if (savedInstanceState == null || !savedInstanceState.containsKey("movies")) {
+        if (savedInstanceState == null || !savedInstanceState.containsKey(MOVIES)) {
             movieList = new ArrayList<Movie>();
             getMovies();
         } else {
-            movieList = savedInstanceState.getParcelableArrayList("movies");
+            movieList = savedInstanceState.getParcelableArrayList(MOVIES);
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList(MOVIE, movieList);
+        outState.putParcelableArrayList(MOVIES, movieList);
         outState.putString("sortPreference", getSortPreference());
         super.onSaveInstanceState(outState);
     }
@@ -59,7 +61,7 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        if (sortPreferences != getSortPreference()) {
+        if (!sortPreferences.equals(getSortPreference())) {
             getMovies();
         }
     }
