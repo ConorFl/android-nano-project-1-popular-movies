@@ -27,7 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 
-public class MainActivityFragment extends Fragment {
+public class MainFragment extends Fragment {
 
     private final String MOVIE = "movie";
     private final String MOVIES = "movies";
@@ -36,7 +36,7 @@ public class MainActivityFragment extends Fragment {
     private ArrayList<Movie> movieList;
     private String sortPreferences;
 
-    public MainActivityFragment() {
+    public MainFragment() {
     }
 
 

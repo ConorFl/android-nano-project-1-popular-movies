@@ -7,7 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class MainActivity extends ActionBarActivity implements MainActivityFragment.Callback {
+public class MainActivity extends ActionBarActivity implements MainFragment.Callback {
     private boolean mTwoPanes;
 
     @Override
