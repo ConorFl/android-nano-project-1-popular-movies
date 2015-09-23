@@ -3,12 +3,11 @@ package com.example.android.popularmovies;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements MainActivityFragment.Callback {
     private boolean mTwoPanes;
 
     @Override
@@ -19,7 +18,7 @@ public class MainActivity extends ActionBarActivity {
             mTwoPanes = true;
             if (savedInstanceState == null) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.details_view_container, new DetailsActivityFragment())
+                        .replace(R.id.details_view_container, new DetailsFragment())
                         .commit();
             }
         } else {
@@ -48,5 +47,14 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onItemSelected(int x) {
+        if (mTwoPanes) {
+            // launch details frag
+        } else {
+            // launch intent...?
+        }
     }
 }

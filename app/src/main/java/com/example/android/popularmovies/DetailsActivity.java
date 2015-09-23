@@ -16,7 +16,7 @@ public class DetailsActivity extends ActionBarActivity {
             Bundle args = new Bundle();
 //            args.putParcelable(DetailFragment.DETAIL_URI, getIntent().getData());
 
-            DetailsActivityFragment fragment = new DetailsActivityFragment();
+            DetailsFragment fragment = new DetailsFragment();
             fragment.setArguments(args);
 
             getSupportFragmentManager().beginTransaction()

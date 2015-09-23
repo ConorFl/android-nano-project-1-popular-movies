@@ -39,6 +39,14 @@ public class MainActivityFragment extends Fragment {
     public MainActivityFragment() {
     }
 
+
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onItemSelected(int x);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

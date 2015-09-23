@@ -15,12 +15,12 @@ import com.squareup.picasso.Picasso;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailsActivityFragment extends Fragment {
+public class DetailsFragment extends Fragment {
 
     final String MOVIE_KEY = "movie";
     Movie movie;
 
-    public DetailsActivityFragment() {
+    public DetailsFragment() {
     }
 
     @Override
