@@ -44,7 +44,7 @@ public class MainFragment extends Fragment {
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        public void onItemSelected(int x);
+        public void onItemSelected(Movie movie);
     }
 
     @Override
@@ -93,11 +93,13 @@ public class MainFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Movie selectedMovie = mMovieAdapter.getItem(position);
+                ((Callback) getActivity()).onItemSelected(selectedMovie);
 
-                Intent detailsIntent = new Intent(getActivity(), DetailsActivity.class);
-                detailsIntent.putExtra(MOVIE, selectedMovie);
 
-                startActivity(detailsIntent);
+//                Intent detailsIntent = new Intent(getActivity(), DetailsActivity.class);
+//                detailsIntent.putExtra(MOVIE, selectedMovie);
+//
+//                startActivity(detailsIntent);
             }
         });
 
