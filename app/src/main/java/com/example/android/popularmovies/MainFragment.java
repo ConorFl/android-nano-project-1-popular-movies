@@ -94,12 +94,6 @@ public class MainFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Movie selectedMovie = mMovieAdapter.getItem(position);
                 ((Callback) getActivity()).onItemSelected(selectedMovie);
-
-
-//                Intent detailsIntent = new Intent(getActivity(), DetailsActivity.class);
-//                detailsIntent.putExtra(MOVIE, selectedMovie);
-//
-//                startActivity(detailsIntent);
             }
         });
 

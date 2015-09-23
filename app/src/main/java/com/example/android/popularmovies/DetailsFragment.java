@@ -17,7 +17,7 @@ import com.squareup.picasso.Picasso;
  */
 public class DetailsFragment extends Fragment {
 
-    final String MOVIE_KEY = "movie";
+    static final String MOVIE_KEY = "movie";
     Movie movie;
 
     public DetailsFragment() {
@@ -27,6 +27,7 @@ public class DetailsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+//        TODO: REMOVE THIS, CAN'T BE READING FROM INTENTS IN TABLETS, GOTTA USE BUNDLES
         Intent intent = getActivity().getIntent();
         if (savedInstanceState != null) {
             // movie saved on screen rotation

@@ -8,7 +8,6 @@ import android.view.MenuItem;
 
 
 public class MainActivity extends ActionBarActivity implements MainFragment.Callback {
-    final String MOVIE_KEY = "movie";
     private boolean mTwoPanes;
 
     @Override
@@ -54,11 +53,18 @@ public class MainActivity extends ActionBarActivity implements MainFragment.Call
     public void onItemSelected(Movie movie) {
         if (mTwoPanes) {
             // launch details frag
-        } else {
-            // launch intent...?
-            Intent detailsIntent = new Intent(this, DetailsActivity.class);
-            detailsIntent.putExtra(MOVIE_KEY, movie);
+            Bundle args = new Bundle();
+            args.putParcelable(DetailsFragment.MOVIE_KEY, movie);
 
+            DetailsFragment fragment = new DetailsFragment();
+            fragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.details_view_container, fragment)
+                    .commit();
+        } else {
+            Intent detailsIntent = new Intent(this, DetailsActivity.class);
+            detailsIntent.putExtra(DetailsFragment.MOVIE_KEY, movie);
             startActivity(detailsIntent);
         }
     }
