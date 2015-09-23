@@ -12,6 +12,17 @@ public class DetailsActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
+        if (savedInstanceState == null) {
+            Bundle args = new Bundle();
+//            args.putParcelable(DetailFragment.DETAIL_URI, getIntent().getData());
+
+            DetailsActivityFragment fragment = new DetailsActivityFragment();
+            fragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.details_view_container, fragment)
+                    .commit();
+        }
     }
 
 

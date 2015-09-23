@@ -9,11 +9,22 @@ import android.view.MenuItem;
 
 
 public class MainActivity extends ActionBarActivity {
+    private boolean mTwoPanes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (findViewById(R.id.details_view_container) != null) {
+            mTwoPanes = true;
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.details_view_container, new DetailsActivityFragment())
+                        .commit();
+            }
+        } else {
+            mTwoPanes = false;
+        }
     }
 
     @Override
