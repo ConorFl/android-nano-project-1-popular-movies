@@ -2,6 +2,7 @@ package com.example.android.popularmovies;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -13,9 +14,6 @@ public class DetailsActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
         if (savedInstanceState == null) {
-//            Bundle args = new Bundle();
-//            args.putParcelable(DetailsFragment.MOVIE_KEY, getIntent().getExtr);
-
             DetailsFragment fragment = new DetailsFragment();
             fragment.setArguments(getIntent().getExtras());
 

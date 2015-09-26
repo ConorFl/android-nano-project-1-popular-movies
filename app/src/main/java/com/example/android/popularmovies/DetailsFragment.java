@@ -29,12 +29,16 @@ public class DetailsFragment extends Fragment {
 
 //        TODO: REMOVE THIS, CAN'T BE READING FROM INTENTS IN TABLETS, GOTTA USE BUNDLES
         Intent intent = getActivity().getIntent();
+        Bundle args = getArguments();
         if (savedInstanceState != null) {
             // movie saved on screen rotation
             movie = savedInstanceState.getParcelable(MOVIE_KEY);
         } else {
             // movie saved in intent
-            movie = intent.getExtras().getParcelable(MOVIE_KEY);
+            // right here is broken... extras is empty
+            if (args != null) {
+                movie = args.getParcelable(MOVIE_KEY);
+            }
         }
     }
 
@@ -42,8 +46,11 @@ public class DetailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_details, container, false);
-
-        populateView(rootView, movie);
+        if (movie != null) {
+            populateView(rootView, movie);
+        } else {
+//            what to do if no movie because just opened app?
+        }
 
         return rootView;
     }
