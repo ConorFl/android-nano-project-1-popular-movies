@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -27,14 +28,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class DetailsFragment extends Fragment {
 
     static final String MOVIE_KEY = "movie";
     Movie movie;
     LinearLayout trailersLayout;
+    FrameLayout favoriteButtonLayout;
 
     public DetailsFragment() {
     }
@@ -58,10 +63,12 @@ public class DetailsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_details, container, false);
         trailersLayout = (LinearLayout) rootView.findViewById(R.id.trailer_buttons);
+        favoriteButtonLayout = (FrameLayout) rootView.findViewById(R.id.favorite_button_container);
         if (movie != null) {
             populateView(rootView, movie);
             FetchMovieTrailersTask movieTrailersTask = new FetchMovieTrailersTask();
             movieTrailersTask.execute(movie.id);
+            addFavoriteButton();
         } else {
 //            what to do if no movie because just opened ??
 //            SHOW FIRST MOVIE
@@ -116,6 +123,69 @@ public class DetailsFragment extends Fragment {
             });
             trailersLayout.addView(button);
         }
+    }
+
+    private void addFavoriteButton() {
+        boolean favorited = isFavorited();
+        final Button favButton = new Button(getActivity());
+        setFavoriteButtonText(favButton, favorited);
+        favoriteButtonLayout.addView(favButton);
+
+        favButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                ArrayList<Integer> favoriteMovieIds = getFavoriteMovieIds();
+                boolean favorited = favoriteMovieIds.contains(movie.id);
+                if (favorited) {
+                    int oldFavoritePosition = favoriteMovieIds.indexOf(movie.id);
+                    favoriteMovieIds.remove(oldFavoritePosition);
+                } else {
+                    favoriteMovieIds.add(movie.id);
+                }
+                setFavoriteMovieIds(favoriteMovieIds);
+                setFavoriteButtonText(favButton, !favorited);
+            }
+        });
+    }
+
+    private void setFavoriteButtonText(Button button, boolean favorited) {
+        String buttonText = isFavorited() ? "Un-favorite this movie" : "Favorite this movie";
+        button.setText(buttonText);
+    }
+
+    private boolean isFavorited() {
+        ArrayList<Integer> favoriteMovieIds = getFavoriteMovieIds();
+        return favoriteMovieIds.contains(movie.id);
+    }
+
+    private ArrayList<Integer> getFavoriteMovieIds() {
+        String arrayName = "favorites";
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        int favoritesCount = prefs.getInt(getString(R.string.pref_favorites_count), 0);
+        ArrayList<Integer> favoritesArray = new ArrayList<>();
+        for(int i = 0; i < favoritesCount; i++) {
+            favoritesArray.add(prefs.getInt(arrayName + "_" + i, 0));
+        }
+        return favoritesArray;
+    }
+
+    private boolean setFavoriteMovieIds(ArrayList<Integer> movieIds) {
+        String arrayName = "favorites";
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = prefs.edit();
+        int oldFavoritesCount = prefs.getInt(getString(R.string.pref_favorites_count), 0);
+        // remove old ones
+        for(int i = 0; i < oldFavoritesCount; i++) {
+            editor.remove(arrayName + "_" + i);
+        }
+        // add new ones
+        editor.putInt(getString(R.string.pref_favorites_count), movieIds.size());
+        for(int i = 0; i < movieIds.size(); i++) {
+            editor.putInt(arrayName + "_" + i, movieIds.get(i));
+        }
+        return editor.commit();
+
     }
 
     public class FetchMovieTrailersTask extends AsyncTask<Integer, Void, String[]> {
@@ -222,38 +292,6 @@ public class DetailsFragment extends Fragment {
 //            This return is only here in case the return above gets caught in an exception
             return null;
         }
-
-        private Integer[] getFavoriteMovieIds() {
-            String arrayName = "favorites";
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            int favoritesCount = prefs.getInt(getString(R.string.pref_favorites_count), 0);
-            Integer[] favoritesArray = new Integer[favoritesCount];
-            for(int i = 0; i < favoritesCount; i++) {
-                favoritesArray[i] = prefs.getInt(arrayName + "_" + i, 0);
-            }
-            return favoritesArray;
-        }
-
-        private boolean setFavoriteMovieIds(Integer[] movieIds) {
-            String arrayName = "favorites";
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt(getString(R.string.pref_favorites_count), movieIds.length);
-            for(int i = 0; i < movieIds.length; i++) {
-                editor.putInt(arrayName + "_" + i, movieIds[i]);
-            }
-            return editor.commit();
-
-        }
-
-//        public boolean saveArray(String[] array, String arrayName, Context mContext) {
-//            SharedPreferences prefs = mContext.getSharedPreferences("preferencename", 0);
-//            SharedPreferences.Editor editor = prefs.edit();
-//            editor.putInt(arrayName +"_size", array.length);
-//            for(int i=0;i<array.length;i++)
-//                editor.putString(arrayName + "_" + i, array[i]);
-//            return editor.commit();
-//        }
 
         @Override
         protected void onPostExecute(String[] parsedMovies) {
