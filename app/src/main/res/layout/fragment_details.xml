@@ -62,5 +62,11 @@
             android:layout_height="wrap_content"
             android:id="@+id/movie_release_date"
             android:layout_below="@id/movie_release_date_label" />
+
+        <LinearLayout
+            android:id="@+id/trailer_buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"></LinearLayout>
     </LinearLayout>
 </ScrollView>

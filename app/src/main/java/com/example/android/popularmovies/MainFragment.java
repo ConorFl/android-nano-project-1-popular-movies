@@ -203,7 +203,7 @@ public class MainFragment extends Fragment {
                 }
                 moviesJsonStr = buffer.toString();
             } catch (IOException e) {
-                Log.e(LOG_TAG, "Error ", e);
+                Log.e(LOG_TAG, "IO Error ", e);
                 // If the code didn't successfully get the movie data, there's no point in
                 // attempting to parse it.
                 return null;
