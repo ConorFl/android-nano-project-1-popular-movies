@@ -1,7 +1,11 @@
 package com.example.android.popularmovies;
 
+import android.app.ActionBar;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -97,10 +101,21 @@ public class DetailsFragment extends Fragment {
         releaseDateView.setText(releaseDate);
     }
 
-    private void populateTrailerLinks(String[] parsedMovies) {
-        Button bt = new Button(getActivity());
-        bt.setText("A Button");
-        trailersLayout.addView(bt);
+    private void populateTrailerLinks(final String[] parsedTrailerUrls) {
+        for (int i = 0; i < parsedTrailerUrls.length; i++) {
+            Button button = new Button(getActivity());
+            button.setText("Play Trailer ".concat(Integer.toString(i + 1)));
+//            the drawable icons are still here but not used, consider removing
+            final String url = parsedTrailerUrls[i];
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent youtubeIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(youtubeIntent);
+                }
+            });
+            trailersLayout.addView(button);
+        }
     }
 
     public class FetchMovieTrailersTask extends AsyncTask<Integer, Void, String[]> {
@@ -111,7 +126,7 @@ public class DetailsFragment extends Fragment {
         private String[] getTrailerUrlsFromJson(String trailersJsonStr) throws JSONException {
             final String YOUTUBE_BASE_URL = "https://www.youtube.com/watch?v=";
             // These are the names of the JSON objects that need to be extracted.
-            final String ID = "id";
+            final String KEY = "key";
             final String TRAILERS_LIST = "results";
 
             JSONObject trailersJson = new JSONObject(trailersJsonStr);
@@ -122,7 +137,7 @@ public class DetailsFragment extends Fragment {
             for(int i = 0; i < trailersCount; i++) {
                 String youtubeId;
                 JSONObject trailer = trailersArray.getJSONObject(i);
-                youtubeId = trailer.getString(ID);
+                youtubeId = trailer.getString(KEY);
                 trailerUrls[i] = YOUTUBE_BASE_URL.concat(youtubeId);
             }
             return trailerUrls;
@@ -207,6 +222,38 @@ public class DetailsFragment extends Fragment {
 //            This return is only here in case the return above gets caught in an exception
             return null;
         }
+
+        private Integer[] getFavoriteMovieIds() {
+            String arrayName = "favorites";
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            int favoritesCount = prefs.getInt(getString(R.string.pref_favorites_count), 0);
+            Integer[] favoritesArray = new Integer[favoritesCount];
+            for(int i = 0; i < favoritesCount; i++) {
+                favoritesArray[i] = prefs.getInt(arrayName + "_" + i, 0);
+            }
+            return favoritesArray;
+        }
+
+        private boolean setFavoriteMovieIds(Integer[] movieIds) {
+            String arrayName = "favorites";
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt(getString(R.string.pref_favorites_count), movieIds.length);
+            for(int i = 0; i < movieIds.length; i++) {
+                editor.putInt(arrayName + "_" + i, movieIds[i]);
+            }
+            return editor.commit();
+
+        }
+
+//        public boolean saveArray(String[] array, String arrayName, Context mContext) {
+//            SharedPreferences prefs = mContext.getSharedPreferences("preferencename", 0);
+//            SharedPreferences.Editor editor = prefs.edit();
+//            editor.putInt(arrayName +"_size", array.length);
+//            for(int i=0;i<array.length;i++)
+//                editor.putString(arrayName + "_" + i, array[i]);
+//            return editor.commit();
+//        }
 
         @Override
         protected void onPostExecute(String[] parsedMovies) {

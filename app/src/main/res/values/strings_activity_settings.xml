@@ -71,4 +71,6 @@
         <item>@string/pref_sort_by_default_value</item>
         <item>vote_average.desc</item>
     </string-array>
+
+    <string name="pref_favorites_count">pref_favorites_count</string>
 </resources>
