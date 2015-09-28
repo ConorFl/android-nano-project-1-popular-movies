@@ -75,8 +75,12 @@ public class MainFragment extends Fragment {
     }
 
     private void getMovies() {
-        FetchMovieDataTask movieDataTask = new FetchMovieDataTask();
-        movieDataTask.execute();
+        if (getSortPreference().equals(getString(R.string.pref_sort_favorites))) {
+//                movieList =
+        } else {
+            FetchMovieDataTask movieDataTask = new FetchMovieDataTask();
+            movieDataTask.execute();
+        }
     }
 
     @Override

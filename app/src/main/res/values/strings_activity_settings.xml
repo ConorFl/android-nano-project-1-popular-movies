@@ -62,14 +62,17 @@
     <string name="pref_sort_by_title">Sort By</string>
     <string name="pref_sort_by_key">sort_by</string>
     <string name="pref_sort_by_default_value">popularity.desc</string>
+    <string name="pref_sort_favorites">favorites</string>
 
     <string-array name="pref_sort_by_labels">
         <item>Popularity</item>
         <item>Rating</item>
+        <item>Favorites</item>
     </string-array>
     <string-array name="pref_sort_by_values">
         <item>@string/pref_sort_by_default_value</item>
         <item>vote_average.desc</item>
+        <item>@string/pref_sort_favorites</item>
     </string-array>
 
     <string name="pref_favorites_count">pref_favorites_count</string>
