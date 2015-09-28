@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -35,7 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class DetailsFragment extends Fragment {
-
+    final Gson gson = new Gson();
     static final String MOVIE_KEY = "movie";
     Movie movie;
     LinearLayout trailersLayout;
@@ -126,8 +127,8 @@ public class DetailsFragment extends Fragment {
     }
 
     private void addFavoriteButton() {
-        boolean favorited = isFavorited();
         final Button favButton = new Button(getActivity());
+        boolean favorited = isFavorited();
         setFavoriteButtonText(favButton, favorited);
         favoriteButtonLayout.addView(favButton);
 
@@ -135,15 +136,14 @@ public class DetailsFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                ArrayList<Integer> favoriteMovieIds = getFavoriteMovieIds();
-                boolean favorited = favoriteMovieIds.contains(movie.id);
+                ArrayList<Movie> favoriteMovies = getFavoriteMovies();
+                boolean favorited = isFavorited();
                 if (favorited) {
-                    int oldFavoritePosition = favoriteMovieIds.indexOf(movie.id);
-                    favoriteMovieIds.remove(oldFavoritePosition);
+                    favoriteMovies.remove(positionInFavorites());
                 } else {
-                    favoriteMovieIds.add(movie.id);
+                    favoriteMovies.add(movie);
                 }
-                setFavoriteMovieIds(favoriteMovieIds);
+                setFavoriteMovies(favoriteMovies);
                 setFavoriteButtonText(favButton, !favorited);
             }
         });
@@ -155,22 +155,36 @@ public class DetailsFragment extends Fragment {
     }
 
     private boolean isFavorited() {
-        ArrayList<Integer> favoriteMovieIds = getFavoriteMovieIds();
-        return favoriteMovieIds.contains(movie.id);
+        return positionInFavorites() != -1;
     }
 
-    private ArrayList<Integer> getFavoriteMovieIds() {
+    private int positionInFavorites() {
+        ArrayList<Movie> favoriteMovies = getFavoriteMovies();
+        for(int i = 0; i < favoriteMovies.size(); i++) {
+            if (favoriteMovies.get(i).id == movie.id) return i;
+        }
+        return -1;
+    }
+
+    private ArrayList<Movie> getFavoriteMovies() {
         String arrayName = "favorites";
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         int favoritesCount = prefs.getInt(getString(R.string.pref_favorites_count), 0);
-        ArrayList<Integer> favoritesArray = new ArrayList<>();
+        ArrayList<Movie> favoritesArray = new ArrayList<>();
+        SharedPreferences.Editor editor = prefs.edit();
+//        for(int i = 0; i < favoritesCount; i++) {
+//            editor.remove(arrayName + "_" + i);
+//        }
+//        editor.remove(getString(R.string.pref_favorites_count));
+//        editor.commit();
         for(int i = 0; i < favoritesCount; i++) {
-            favoritesArray.add(prefs.getInt(arrayName + "_" + i, 0));
+            favoritesArray
+                    .add(gson.fromJson(prefs.getString(arrayName + "_" + i, null), Movie.class));
         }
         return favoritesArray;
     }
 
-    private boolean setFavoriteMovieIds(ArrayList<Integer> movieIds) {
+    private boolean setFavoriteMovies(ArrayList<Movie> favoriteMovies) {
         String arrayName = "favorites";
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor editor = prefs.edit();
@@ -180,9 +194,9 @@ public class DetailsFragment extends Fragment {
             editor.remove(arrayName + "_" + i);
         }
         // add new ones
-        editor.putInt(getString(R.string.pref_favorites_count), movieIds.size());
-        for(int i = 0; i < movieIds.size(); i++) {
-            editor.putInt(arrayName + "_" + i, movieIds.get(i));
+        editor.putInt(getString(R.string.pref_favorites_count), favoriteMovies.size());
+        for(int i = 0; i < favoriteMovies.size(); i++) {
+            editor.putString(arrayName + "_" + i, gson.toJson(favoriteMovies.get(i), Movie.class));
         }
         return editor.commit();
 
