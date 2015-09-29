@@ -49,6 +49,7 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.e("CONORE", "onCREATE called");
         super.onCreate(savedInstanceState);
         sortPreferences = getSortPreference();
         if (savedInstanceState == null || !savedInstanceState.containsKey(MOVIES)) {
@@ -57,6 +58,7 @@ public class MainFragment extends Fragment {
         } else {
             movieList = savedInstanceState.getParcelableArrayList(MOVIES);
         }
+        Log.e("CONORE", "onCREATE finished");
     }
 
     @Override
@@ -68,15 +70,25 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onStart() {
+        Log.e("CONORE", "onstart called");
         super.onStart();
         if (!sortPreferences.equals(getSortPreference())) {
+            sortPreferences = getSortPreference();
             getMovies();
         }
     }
 
     private void getMovies() {
+        Log.e("CONORE", "getmovies");
+        Log.e("CONORE", getSortPreference());
         if (getSortPreference().equals(getString(R.string.pref_sort_favorites))) {
-//                movieList =
+            Log.e("CONORE", "SUCCESS????");
+            movieList = MoviesUtility.getFavoriteMovies(getActivity());
+            if(mMovieAdapter != null) {
+                Log.e("CONORE", "notifying adapter");
+                Log.e("CONORE", Integer.toString(movieList.size()));
+                mMovieAdapter.notifyDataSetChanged();
+            }
         } else {
             FetchMovieDataTask movieDataTask = new FetchMovieDataTask();
             movieDataTask.execute();
@@ -86,6 +98,7 @@ public class MainFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.e("CONORE", "onCreateView called");
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         mMovieAdapter = new MovieAdapter(getActivity(), movieList);
@@ -100,7 +113,7 @@ public class MainFragment extends Fragment {
                 ((Callback) getActivity()).onItemSelected(selectedMovie);
             }
         });
-
+        Log.e("CONORE", "onCreaveView finished");
         return rootView;
     }
 
