@@ -83,7 +83,8 @@ public class MainFragment extends Fragment {
         Log.e("CONORE", getSortPreference());
         if (getSortPreference().equals(getString(R.string.pref_sort_favorites))) {
             Log.e("CONORE", "SUCCESS????");
-            movieList = MoviesUtility.getFavoriteMovies(getActivity());
+            movieList.clear();
+            movieList.addAll(MoviesUtility.getFavoriteMovies(getActivity()));
             if(mMovieAdapter != null) {
                 Log.e("CONORE", "notifying adapter");
                 Log.e("CONORE", Integer.toString(movieList.size()));
