@@ -24,6 +24,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,12 +38,18 @@ import java.util.Arrays;
 
 public class DetailsFragment extends Fragment {
     final Gson gson = new Gson();
+
     static final String MOVIE_KEY = "movie";
     static final String TRAILERS_KEY = "trailers";
+    static final String REVIEWS_KEY = "reviews";
+
     Movie movie;
     ArrayList<String> movieTrailerUrls;
-    LinearLayout trailersLayout;
+    ArrayList<Review> movieReviews;
+
     FrameLayout favoriteButtonLayout;
+    LinearLayout trailersLayout;
+    LinearLayout reviewsLayout;
 
     public DetailsFragment() {
     }
@@ -55,6 +62,7 @@ public class DetailsFragment extends Fragment {
             // movie saved on screen rotation
             movie = savedInstanceState.getParcelable(MOVIE_KEY);
             movieTrailerUrls = savedInstanceState.getStringArrayList(TRAILERS_KEY);
+            movieReviews = savedInstanceState.getParcelableArrayList(REVIEWS_KEY);
         } else if(args != null) {
             // movie saved in intent
             movie = args.getParcelable(MOVIE_KEY);
@@ -67,6 +75,7 @@ public class DetailsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_details, container, false);
         trailersLayout = (LinearLayout) rootView.findViewById(R.id.trailer_buttons);
         favoriteButtonLayout = (FrameLayout) rootView.findViewById(R.id.favorite_button_container);
+        reviewsLayout = (LinearLayout) rootView.findViewById(R.id.reviews_container);
         if (movie != null) {
             populateView(rootView, movie);
             addFavoriteButton();
@@ -75,6 +84,12 @@ public class DetailsFragment extends Fragment {
                 movieTrailersTask.execute(movie.id);
             } else {
                 populateTrailerLinks();
+            }
+            if (movieReviews == null) {
+                FetchMovieReviewsTask movieReviewsTask = new FetchMovieReviewsTask();
+                movieReviewsTask.execute(movie.id);
+            } else {
+                populateReviews();
             }
         } else {
 //            what to do if no movie because just opened ??
@@ -88,6 +103,7 @@ public class DetailsFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(MOVIE_KEY, movie);
         outState.putStringArrayList(TRAILERS_KEY, movieTrailerUrls);
+        outState.putParcelableArrayList(REVIEWS_KEY, movieReviews);
         super.onSaveInstanceState(outState);
     }
 
@@ -130,6 +146,24 @@ public class DetailsFragment extends Fragment {
                 }
             });
             trailersLayout.addView(button);
+        }
+    }
+
+    private void populateReviews() {
+        if (movieReviews.size() > 0) {
+            TextView title = new TextView(getActivity());
+            title.setText("Reviews");
+            title.setTextAppearance(getActivity(), android.R.style.TextAppearance_Medium);
+            reviewsLayout.addView(title);
+        }
+        for (int i = 0; i < movieReviews.size(); i++) {
+            Review review = movieReviews.get(i);
+            TextView reviewTextView = new TextView(getActivity());
+            reviewTextView.setText(review.content);
+            reviewsLayout.addView(reviewTextView);
+            TextView authorTextView = new TextView(getActivity());
+            authorTextView.setText(" -" + review.author);
+            reviewsLayout.addView(authorTextView);
         }
     }
 
@@ -285,115 +319,120 @@ public class DetailsFragment extends Fragment {
             populateTrailerLinks();
         }
     }
-//
-//    public class FetchMovieReviewsTask extends AsyncTask<Integer, Void, String[]> {
-//
-//        private final String LOG_TAG = FetchMovieReviewsTask.class.getSimpleName();
-//
-//        // Get movie trailer URLs from JSON object of movie trailers for a given movie
-//        private String[] getReviewsFromJson(String trailersJsonStr) throws JSONException {
-//            final String YOUTUBE_BASE_URL = "https://www.youtube.com/watch?v=";
-//            // These are the names of the JSON objects that need to be extracted.
-//            final String KEY = "key";
-//            final String TRAILERS_LIST = "results";
-//
-//            JSONObject trailersJson = new JSONObject(trailersJsonStr);
-//            JSONArray trailersArray = trailersJson.getJSONArray(TRAILERS_LIST);
-//            int trailersCount = trailersArray.length();
-//
-//            String[] trailerUrls = new String[trailersCount];
-//            for(int i = 0; i < trailersCount; i++) {
-//                String youtubeId;
-//                JSONObject trailer = trailersArray.getJSONObject(i);
-//                youtubeId = trailer.getString(KEY);
-//                trailerUrls[i] = YOUTUBE_BASE_URL.concat(youtubeId);
-//            }
-//            return trailerUrls;
-//        }
-//
-//        @Override
-//        protected String[] doInBackground(Integer... params) {
-//            // These two need to be declared outside the try/catch
-//            // so that they can be closed in the finally block.
-//            HttpURLConnection urlConnection = null;
-//            BufferedReader reader = null;
-//
-//            // Will contain the raw JSON response as a string.
-//            String reviewsJsonStr = null;
-//
-//            try {
-//                final String MOVIE_DB_BASE_URL = "http://api.themoviedb.org/3/movie";
-//                final String REVIEWS = "reviews";
-//                final String API_PARAM = "api_key";
-//                final String movieIdStr = Integer.toString(params[0]);
-//
-//                Uri builtUri = Uri.parse(MOVIE_DB_BASE_URL).buildUpon()
-//                        .appendPath(movieIdStr)
-//                        .appendPath(REVIEWS)
-//                        .appendQueryParameter(API_PARAM, getString(R.string.the_movie_db_api_key))
-//                        .build();
-//
-//                URL url = new URL(builtUri.toString());
-//
-//                // Create the request to TheMovieDB, and open the connection
-//                urlConnection = (HttpURLConnection) url.openConnection();
-//                urlConnection.setRequestMethod("GET");
-//                urlConnection.connect();
-//                // Read the input stream into a String
-//                InputStream inputStream = urlConnection.getInputStream();
-//                StringBuffer buffer = new StringBuffer();
-//                if (inputStream == null) {
-//                    // Nothing to do.
-//                    return null;
-//                }
-//                reader = new BufferedReader(new InputStreamReader(inputStream));
-//
-//                String line;
-//                while ((line = reader.readLine()) != null) {
-//                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-//                    // But it does make debugging a *lot* easier if you print out the completed
-//                    // buffer for debugging.
-//                    buffer.append(line + "\n");
-//                }
-//
-//                if (buffer.length() == 0) {
-//                    // Stream was empty.  No point in parsing.
-//                    return null;
-//                }
-//                reviewsJsonStr = buffer.toString();
-//            } catch (IOException e) {
-//                Log.e(LOG_TAG, "IO Error ", e);
-//                // If the code didn't successfully get the review data, there's no point in
-//                // attempting to parse it.
-//                return null;
-//            } finally {
-//                if (urlConnection != null) {
-//                    urlConnection.disconnect();
-//                }
-//                if (reader != null) {
-//                    try {
-//                        reader.close();
-//                    } catch (final IOException e) {
-//                        Log.e(LOG_TAG, "Error closing stream", e);
-//                    }
-//                }
-//            }
-//
-//            try {
-//                return getReviewsFromJson(reviewsJsonStr);
-//            }
-//            catch (JSONException e) {
-//                Log.e(LOG_TAG, e.getMessage(), e);
-//                e.printStackTrace();
-//            }
-//
-////            This return is only here in case the return above gets caught in an exception
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String[] parsedMovies) {
-//            populateTrailerLinks(parsedMovies);
-//        }
-//    }
+
+    public class FetchMovieReviewsTask extends AsyncTask<Integer, Void, Review[]> {
+
+        private final String LOG_TAG = FetchMovieReviewsTask.class.getSimpleName();
+
+        // Get movie trailer URLs from JSON object of movie trailers for a given movie
+        private Review[] getReviewsFromJson(String reviewsJsonStr) throws JSONException {
+            // These are the names of the JSON objects that need to be extracted.
+            final String REVIEWS_LIST = "results";
+
+            final String ID = "id";
+            final String AUTHOR = "author";
+            final String CONTENT = "content";
+
+            JSONObject reviewsJson = new JSONObject(reviewsJsonStr);
+            JSONArray jsonReviewsArray = reviewsJson.getJSONArray(REVIEWS_LIST);
+            int reviewsCount = jsonReviewsArray.length();
+
+            Review[] reviewsArray = new Review[reviewsCount];
+            for(int i = 0; i < reviewsCount; i++) {
+                JSONObject review = jsonReviewsArray.getJSONObject(i);
+                String id = review.getString(ID);
+                String author = review.getString(AUTHOR);
+                String content = review.getString(CONTENT);
+
+                reviewsArray[i] = new Review(id, author, content);
+            }
+            return reviewsArray;
+        }
+
+        @Override
+        protected Review[] doInBackground(Integer... params) {
+            // These two need to be declared outside the try/catch
+            // so that they can be closed in the finally block.
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            // Will contain the raw JSON response as a string.
+            String reviewsJsonStr = null;
+
+            try {
+                final String MOVIE_DB_BASE_URL = "http://api.themoviedb.org/3/movie";
+                final String REVIEWS = "reviews";
+                final String API_PARAM = "api_key";
+                final String movieIdStr = Integer.toString(params[0]);
+
+                Uri builtUri = Uri.parse(MOVIE_DB_BASE_URL).buildUpon()
+                        .appendPath(movieIdStr)
+                        .appendPath(REVIEWS)
+                        .appendQueryParameter(API_PARAM, getString(R.string.the_movie_db_api_key))
+                        .build();
+
+                URL url = new URL(builtUri.toString());
+
+                // Create the request to TheMovieDB, and open the connection
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+                // Read the input stream into a String
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do.
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a *lot* easier if you print out the completed
+                    // buffer for debugging.
+                    buffer.append(line + "\n");
+                }
+
+                if (buffer.length() == 0) {
+                    // Stream was empty.  No point in parsing.
+                    return null;
+                }
+                reviewsJsonStr = buffer.toString();
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "IO Error ", e);
+                // If the code didn't successfully get the review data, there's no point in
+                // attempting to parse it.
+                return null;
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e(LOG_TAG, "Error closing stream", e);
+                    }
+                }
+            }
+
+            try {
+                return getReviewsFromJson(reviewsJsonStr);
+            }
+            catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                e.printStackTrace();
+            }
+
+//            This return is only here in case the return above gets caught in an exception
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Review[] parsedReviews) {
+            movieReviews = new ArrayList<>(Arrays.asList(parsedReviews));
+            populateReviews();
+        }
+    }
 }

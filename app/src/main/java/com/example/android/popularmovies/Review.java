@@ -8,18 +8,18 @@ import android.os.Parcelable;
  */
 
 public class Review implements Parcelable {
-    int id;
+    String id;
     String author;
     String content;
 
-    public Review(int id, String author, String content) {
+    public Review(String id, String author, String content) {
         this.id = id;
         this.author = author;
         this.content = content;
     }
 
     private Review(Parcel in) {
-        id = in.readInt();
+        id = in.readString();
         author = in.readString();
         content = in.readString();
     }
@@ -31,7 +31,7 @@ public class Review implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
+        dest.writeString(id);
         dest.writeString(author);
         dest.writeString(content);
     }
