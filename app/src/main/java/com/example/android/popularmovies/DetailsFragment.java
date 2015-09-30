@@ -38,7 +38,9 @@ import java.util.Arrays;
 public class DetailsFragment extends Fragment {
     final Gson gson = new Gson();
     static final String MOVIE_KEY = "movie";
+    static final String TRAILERS_KEY = "trailers";
     Movie movie;
+    ArrayList<String> movieTrailerUrls;
     LinearLayout trailersLayout;
     FrameLayout favoriteButtonLayout;
 
@@ -52,6 +54,7 @@ public class DetailsFragment extends Fragment {
         if (savedInstanceState != null) {
             // movie saved on screen rotation
             movie = savedInstanceState.getParcelable(MOVIE_KEY);
+            movieTrailerUrls = savedInstanceState.getStringArrayList(TRAILERS_KEY);
         } else if(args != null) {
         // movie saved in intent
         // right here is broken... extras is empty
@@ -67,12 +70,16 @@ public class DetailsFragment extends Fragment {
         favoriteButtonLayout = (FrameLayout) rootView.findViewById(R.id.favorite_button_container);
         if (movie != null) {
             populateView(rootView, movie);
-            FetchMovieTrailersTask movieTrailersTask = new FetchMovieTrailersTask();
-            movieTrailersTask.execute(movie.id);
             addFavoriteButton();
+            if (movieTrailerUrls == null) {
+                FetchMovieTrailersTask movieTrailersTask = new FetchMovieTrailersTask();
+                movieTrailersTask.execute(movie.id);
+            } else {
+                populateTrailerLinks();
+            }
         } else {
 //            what to do if no movie because just opened ??
-//            SHOW FIRST MOVIE
+//            SHOW FIRST MOVIE ??
         }
 
         return rootView;
@@ -81,6 +88,7 @@ public class DetailsFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(MOVIE_KEY, movie);
+        outState.putStringArrayList(TRAILERS_KEY, movieTrailerUrls);
         super.onSaveInstanceState(outState);
     }
 
@@ -109,12 +117,12 @@ public class DetailsFragment extends Fragment {
         releaseDateView.setText(releaseDate);
     }
 
-    private void populateTrailerLinks(final String[] parsedTrailerUrls) {
-        for (int i = 0; i < parsedTrailerUrls.length; i++) {
+    private void populateTrailerLinks() {
+        for (int i = 0; i < movieTrailerUrls.size(); i++) {
             Button button = new Button(getActivity());
             button.setText("Play Trailer ".concat(Integer.toString(i + 1)));
 //            the drawable icons are still here but not used, consider removing
-            final String url = parsedTrailerUrls[i];
+            final String url = movieTrailerUrls.get(i);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -166,36 +174,6 @@ public class DetailsFragment extends Fragment {
         return -1;
     }
 
-//    private ArrayList<Movie> getFavoriteMovies() {
-//        String arrayName = "favorites";
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-//        int favoritesCount = prefs.getInt(getString(R.string.pref_favorites_count), 0);
-//        ArrayList<Movie> favoritesArray = new ArrayList<>();
-//        for(int i = 0; i < favoritesCount; i++) {
-//            favoritesArray
-//                    .add(gson.fromJson(prefs.getString(arrayName + "_" + i, null), Movie.class));
-//        }
-//        return favoritesArray;
-//    }
-//
-//    private boolean setFavoriteMovies(ArrayList<Movie> favoriteMovies) {
-//        String arrayName = "favorites";
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-//        SharedPreferences.Editor editor = prefs.edit();
-//        int oldFavoritesCount = prefs.getInt(getString(R.string.pref_favorites_count), 0);
-//        // remove old ones
-//        for(int i = 0; i < oldFavoritesCount; i++) {
-//            editor.remove(arrayName + "_" + i);
-//        }
-//        // add new ones
-//        editor.putInt(getString(R.string.pref_favorites_count), favoriteMovies.size());
-//        for(int i = 0; i < favoriteMovies.size(); i++) {
-//            editor.putString(arrayName + "_" + i, gson.toJson(favoriteMovies.get(i), Movie.class));
-//        }
-//        return editor.commit();
-//
-//    }
-
     public class FetchMovieTrailersTask extends AsyncTask<Integer, Void, String[]> {
 
         private final String LOG_TAG = FetchMovieTrailersTask.class.getSimpleName();
@@ -223,6 +201,7 @@ public class DetailsFragment extends Fragment {
 
         @Override
         protected String[] doInBackground(Integer... params) {
+            Log.e("CONOR", "fetching trailerzz....");
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
@@ -303,7 +282,119 @@ public class DetailsFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String[] parsedMovies) {
-            populateTrailerLinks(parsedMovies);
+            movieTrailerUrls = new ArrayList<>(Arrays.asList(parsedMovies));
+            populateTrailerLinks();
         }
     }
+//
+//    public class FetchMovieReviewsTask extends AsyncTask<Integer, Void, String[]> {
+//
+//        private final String LOG_TAG = FetchMovieReviewsTask.class.getSimpleName();
+//
+//        // Get movie trailer URLs from JSON object of movie trailers for a given movie
+//        private String[] getReviewsFromJson(String trailersJsonStr) throws JSONException {
+//            final String YOUTUBE_BASE_URL = "https://www.youtube.com/watch?v=";
+//            // These are the names of the JSON objects that need to be extracted.
+//            final String KEY = "key";
+//            final String TRAILERS_LIST = "results";
+//
+//            JSONObject trailersJson = new JSONObject(trailersJsonStr);
+//            JSONArray trailersArray = trailersJson.getJSONArray(TRAILERS_LIST);
+//            int trailersCount = trailersArray.length();
+//
+//            String[] trailerUrls = new String[trailersCount];
+//            for(int i = 0; i < trailersCount; i++) {
+//                String youtubeId;
+//                JSONObject trailer = trailersArray.getJSONObject(i);
+//                youtubeId = trailer.getString(KEY);
+//                trailerUrls[i] = YOUTUBE_BASE_URL.concat(youtubeId);
+//            }
+//            return trailerUrls;
+//        }
+//
+//        @Override
+//        protected String[] doInBackground(Integer... params) {
+//            // These two need to be declared outside the try/catch
+//            // so that they can be closed in the finally block.
+//            HttpURLConnection urlConnection = null;
+//            BufferedReader reader = null;
+//
+//            // Will contain the raw JSON response as a string.
+//            String reviewsJsonStr = null;
+//
+//            try {
+//                final String MOVIE_DB_BASE_URL = "http://api.themoviedb.org/3/movie";
+//                final String REVIEWS = "reviews";
+//                final String API_PARAM = "api_key";
+//                final String movieIdStr = Integer.toString(params[0]);
+//
+//                Uri builtUri = Uri.parse(MOVIE_DB_BASE_URL).buildUpon()
+//                        .appendPath(movieIdStr)
+//                        .appendPath(REVIEWS)
+//                        .appendQueryParameter(API_PARAM, getString(R.string.the_movie_db_api_key))
+//                        .build();
+//
+//                URL url = new URL(builtUri.toString());
+//
+//                // Create the request to TheMovieDB, and open the connection
+//                urlConnection = (HttpURLConnection) url.openConnection();
+//                urlConnection.setRequestMethod("GET");
+//                urlConnection.connect();
+//                // Read the input stream into a String
+//                InputStream inputStream = urlConnection.getInputStream();
+//                StringBuffer buffer = new StringBuffer();
+//                if (inputStream == null) {
+//                    // Nothing to do.
+//                    return null;
+//                }
+//                reader = new BufferedReader(new InputStreamReader(inputStream));
+//
+//                String line;
+//                while ((line = reader.readLine()) != null) {
+//                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+//                    // But it does make debugging a *lot* easier if you print out the completed
+//                    // buffer for debugging.
+//                    buffer.append(line + "\n");
+//                }
+//
+//                if (buffer.length() == 0) {
+//                    // Stream was empty.  No point in parsing.
+//                    return null;
+//                }
+//                reviewsJsonStr = buffer.toString();
+//            } catch (IOException e) {
+//                Log.e(LOG_TAG, "IO Error ", e);
+//                // If the code didn't successfully get the review data, there's no point in
+//                // attempting to parse it.
+//                return null;
+//            } finally {
+//                if (urlConnection != null) {
+//                    urlConnection.disconnect();
+//                }
+//                if (reader != null) {
+//                    try {
+//                        reader.close();
+//                    } catch (final IOException e) {
+//                        Log.e(LOG_TAG, "Error closing stream", e);
+//                    }
+//                }
+//            }
+//
+//            try {
+//                return getReviewsFromJson(reviewsJsonStr);
+//            }
+//            catch (JSONException e) {
+//                Log.e(LOG_TAG, e.getMessage(), e);
+//                e.printStackTrace();
+//            }
+//
+////            This return is only here in case the return above gets caught in an exception
+//            return null;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String[] parsedMovies) {
+//            populateTrailerLinks(parsedMovies);
+//        }
+//    }
 }
