@@ -56,8 +56,7 @@ public class DetailsFragment extends Fragment {
             movie = savedInstanceState.getParcelable(MOVIE_KEY);
             movieTrailerUrls = savedInstanceState.getStringArrayList(TRAILERS_KEY);
         } else if(args != null) {
-        // movie saved in intent
-        // right here is broken... extras is empty
+            // movie saved in intent
             movie = args.getParcelable(MOVIE_KEY);
         }
     }
