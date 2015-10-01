@@ -108,6 +108,7 @@ public class DetailsFragment extends Fragment {
     }
 
     private void populateView(View rootView, Movie movie) {
+        populateViewLabels(rootView);
         String title = movie.title;
         String posterUrl = movie.imageUrl;
         String synopsis = movie.overview;
@@ -130,6 +131,15 @@ public class DetailsFragment extends Fragment {
 
         TextView releaseDateView = (TextView) rootView.findViewById(R.id.movie_release_date);
         releaseDateView.setText(releaseDate);
+    }
+
+    private void populateViewLabels(View rootView) {
+        TextView synopsisLabel = ((TextView) rootView.findViewById(R.id.movie_synopsis_label));
+        synopsisLabel.setText(R.string.synopsis_label_text);
+        TextView ratingsLabel = ((TextView) rootView.findViewById(R.id.movie_rating_label));
+        ratingsLabel.setText(R.string.rating_label_text);
+        TextView releaseDateLabel = ((TextView) rootView.findViewById(R.id.movie_release_date_label));
+        releaseDateLabel.setText(R.string.release_date_label_text);
     }
 
     private void populateTrailerLinks() {
@@ -234,7 +244,6 @@ public class DetailsFragment extends Fragment {
 
         @Override
         protected String[] doInBackground(Integer... params) {
-            Log.e("CONOR", "fetching trailerzz....");
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;

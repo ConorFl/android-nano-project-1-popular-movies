@@ -31,8 +31,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/movie_synopsis_label"
             android:layout_below="@id/movie_poster"
-            android:text="Synopsis"
-            android:textStyle="bold"/>
+            android:textColor="#000000"
+            android:textAppearance="?android:textAppearanceMedium"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -45,8 +45,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/movie_rating_label"
             android:layout_below="@id/movie_synopsis"
-            android:text="Rating"
-            android:textStyle="bold"/>
+            android:textColor="#000000"
+            android:textAppearance="?android:textAppearanceMedium"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -59,8 +59,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/movie_release_date_label"
             android:layout_below="@id/movie_rating"
-            android:text="Release Date"
-            android:textStyle="bold"/>
+            android:textColor="#000000"
+            android:textAppearance="?android:textAppearanceMedium"/>
 
         <TextView
             android:layout_width="wrap_content"

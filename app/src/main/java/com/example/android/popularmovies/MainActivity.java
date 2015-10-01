@@ -20,6 +20,7 @@ public class MainActivity extends ActionBarActivity implements MainFragment.Call
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.details_view_container, new DetailsFragment())
                         .commit();
+                getSupportFragmentManager().findFragmentById(R.id.main_fragment).getActivity();
             }
         } else {
             mTwoPanes = false;

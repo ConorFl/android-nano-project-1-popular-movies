@@ -1,6 +1,5 @@
 package com.example.android.popularmovies;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -29,7 +28,6 @@ import java.util.ArrayList;
 
 public class MainFragment extends Fragment {
 
-    private final String MOVIE = "movie";
     private final String MOVIES = "movies";
 
     private MovieAdapter mMovieAdapter;
@@ -44,21 +42,19 @@ public class MainFragment extends Fragment {
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        public void onItemSelected(Movie movie);
+        void onItemSelected(Movie movie);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.e("CONORE", "onCREATE called");
         super.onCreate(savedInstanceState);
         sortPreferences = getSortPreference();
         if (savedInstanceState == null || !savedInstanceState.containsKey(MOVIES)) {
-            movieList = new ArrayList<Movie>();
+            movieList = new ArrayList<>();
             getMovies();
         } else {
             movieList = savedInstanceState.getParcelableArrayList(MOVIES);
         }
-        Log.e("CONORE", "onCREATE finished");
     }
 
     @Override
@@ -70,7 +66,6 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onStart() {
-        Log.e("CONORE", "onstart called");
         super.onStart();
         if (!sortPreferences.equals(getSortPreference())) {
             sortPreferences = getSortPreference();
@@ -79,15 +74,10 @@ public class MainFragment extends Fragment {
     }
 
     private void getMovies() {
-        Log.e("CONORE", "getmovies");
-        Log.e("CONORE", getSortPreference());
         if (getSortPreference().equals(getString(R.string.pref_sort_favorites))) {
-            Log.e("CONORE", "SUCCESS????");
             movieList.clear();
             movieList.addAll(MoviesUtility.getFavoriteMovies(getActivity()));
             if(mMovieAdapter != null) {
-                Log.e("CONORE", "notifying adapter");
-                Log.e("CONORE", Integer.toString(movieList.size()));
                 mMovieAdapter.notifyDataSetChanged();
             }
         } else {
@@ -99,7 +89,6 @@ public class MainFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.e("CONORE", "onCreateView called");
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         mMovieAdapter = new MovieAdapter(getActivity(), movieList);
@@ -114,7 +103,6 @@ public class MainFragment extends Fragment {
                 ((Callback) getActivity()).onItemSelected(selectedMovie);
             }
         });
-        Log.e("CONORE", "onCreaveView finished");
         return rootView;
     }
 
